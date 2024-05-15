@@ -3,13 +3,22 @@
     <h2>Phishing Events</h2>
     <input type="text" v-model="searchQuery" placeholder="Search..." />
     <button @click="searchEvents">Search</button>
-    <ul>
-      <li v-for="event in events" :key="event.id">
-        <h3>{{ event.name }}</h3>
-        <p>{{ event.description }}</p>
-        <button @click="editEvent(event)">Edit</button>
-      </li>
-    </ul>
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th v-for="attribute in eventAttributes" :key="attribute">
+            {{ attribute }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="event in events" :key="event.id">
+          <td>{{ event.name }}</td>
+          <td>{{ event.description }}</td>
+          <button @click="editEvent(event)">Edit</button>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -26,6 +35,17 @@ export default {
       searchQuery: "",
       currentEvent: null,
       isEditing: false,
+      eventAttributes: [
+        "timestamp",
+        "name",
+        "affected brand",
+        "description",
+        "malicious url",
+        "malicious domain registration date",
+        "dns records",
+        "keywords",
+        "status",
+      ],
     };
   },
   // async created() {
@@ -33,10 +53,10 @@ export default {
   // },
   async created() {
     try {
-      const response = await mockAxios.get('/api/events');
+      const response = await mockAxios.get("/api/events");
       this.events = response.data;
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error("Error fetching events:", error);
     }
   },
   methods: {
@@ -56,7 +76,7 @@ export default {
       console.log("editEvent running");
       this.currentEvent = event;
       this.isEditing = true;
-      this.$emit('editStatus', this.isEditing);
+      this.$emit("editStatus", this.isEditing);
     },
     async handleFormSubmitted() {
       await this.fetchEvents();
@@ -66,3 +86,21 @@ export default {
   },
 };
 </script>
+
+<style>
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.styled-table th {
+  background-color: #f4f4f4;
+}
+</style>
