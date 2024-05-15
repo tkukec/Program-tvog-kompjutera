@@ -91,6 +91,7 @@ export default {
       this.event.dns_records.push({ type: "", value: "" });
     },
     async submitForm() {
+      console.log(event)
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
