@@ -1,7 +1,8 @@
 <template>
   <div>
     <h1>Dashboard</h1>
-    <EventList @editStatus="handleEditStatus"/>
+    <button @click="logout">Logout</button>
+    <EventList @editStatus="handleEditStatus" />
     <EventForm
       v-if="isEditing"
       :event="currentEvent"
@@ -33,6 +34,10 @@ export default {
     handleFormSubmitted() {
       this.currentEvent = null;
       this.isEditing = false;
+    },
+    logout() {
+      localStorage.removeItem("token");
+      this.$router.push("/");
     },
   },
 };
