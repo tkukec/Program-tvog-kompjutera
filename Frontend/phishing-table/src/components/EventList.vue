@@ -15,6 +15,7 @@
 
 <script>
 import axios from "axios";
+import mockAxios from "../api/mockApi";
 import EventForm from "./EventForm.vue";
 
 export default {
@@ -27,8 +28,16 @@ export default {
       isEditing: false,
     };
   },
+  // async created() {
+  //   await this.fetchEvents();
+  // },
   async created() {
-    await this.fetchEvents();
+    try {
+      const response = await mockAxios.get('/api/events');
+      this.events = response.data;
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
   },
   methods: {
     async fetchEvents() {
