@@ -8,23 +8,19 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 app = FastAPI()
-
 
 MONGO_DETAILS = os.getenv("DB_URL")
 client = MongoClient(MONGO_DETAILS)
 database = client.get_database("Cluster0")
 user_collection = database.get_collection("users")
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-
-SECRET_KEY = os.getenv("SECRET_KEY", "YOUR_SECRET_KEY_HERE") 
+SECRET_KEY = os.getenv("SECRET_KEY", "YOUR_SECRET_KEY_HERE")
 ALGORITHM = "HS256"
 
 def get_password_hash(password):
@@ -74,24 +70,12 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)  
+        expire = datetime.utcnow() + timedelta(minutes=15)  # Default to 15 minutes expiry
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-@app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_user(form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token = create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
-
-@app.post("/register", response_description="Register a new user")
+@app.post("/register", response_model=Token, response_description="Register a new user and return JWT")
 async def register_user(user: User):
     user_in_db = get_user(user.email)
     if user_in_db:
@@ -102,14 +86,14 @@ async def register_user(user: User):
     hashed_password = get_password_hash(user.password)
     user_obj = UserInDB(**user.dict(), hashed_password=hashed_password)
     user_collection.insert_one(user_obj.dict(exclude={"password"}))
-    return {"message": "User registered successfully"}
+    access_token = create_access_token(data={"sub": user.email})
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @app.post("/forgot-password/")
 def forgot_password(email: str):
     user = get_user(email)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-   
     return {"message": f"Password reset link would be sent to: {email}"}
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
