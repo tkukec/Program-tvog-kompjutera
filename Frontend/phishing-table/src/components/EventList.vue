@@ -53,8 +53,10 @@ export default {
       this.fetchEvents(); // Implement a search function on the backend
     },
     editEvent(event) {
+      console.log("editEvent running");
       this.currentEvent = event;
       this.isEditing = true;
+      this.$emit('editStatus', this.isEditing);
     },
     async handleFormSubmitted() {
       await this.fetchEvents();
