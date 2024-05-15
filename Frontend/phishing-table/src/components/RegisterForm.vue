@@ -38,7 +38,7 @@ export default {
   methods: {
     async register() {
       try {
-        await axios.post("http://your-backend-api/register", {
+        await axios.post("http://127.0.0.1:8000/register", {
           name: this.name,
           surname: this.surname,
           email: this.email,
