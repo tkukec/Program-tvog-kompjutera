@@ -28,11 +28,12 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post("http://your-backend-api/login", {
-          email: this.email,
-          password: this.password,
-        });
-        localStorage.setItem("token", response.data.token);
+        // const response = await axios.post("http://your-backend-api/login", {
+        //   email: this.email,
+        //   password: this.password,
+        // });
+        // localStorage.setItem("token", response.data.token);
+        localStorage.setItem("token", "fake-jwt-token");
         this.$router.push("/dashboard");
       } catch (error) {
         alert("Login failed");
